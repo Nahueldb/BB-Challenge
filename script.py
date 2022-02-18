@@ -10,7 +10,7 @@ MOVIE_COMMENTS = "https://yts.mx/api/v2/movie_comments.json"
 MOVIE_REVIEWS = "https://yts.mx/api/v2/movie_reviews.json"
 MOVIE_PARENTAL = "https://yts.mx/api/v2/movie_parental_guides.json"
 LIMITE_PELICULAS = 50
-PAG_INICIAL = 1
+PAG_INICIAL = 786
 
 class Peliculas:
     def  __init__(self):
@@ -42,12 +42,14 @@ class Peliculas:
     def obtenerContenido(self):
         """Metodo para obtener el contenido de la plataforma"""
         response = requests.get(self.url_lista)
+
         if response.status_code == 200:
             response_json = json.loads(response.text)
             cantidad_peliculas = response_json["data"]["movie_count"]
             self.obtenerCantPags(limite = LIMITE_PELICULAS, cantidad_peliculas = cantidad_peliculas)
             contador_pags = PAG_INICIAL
             total_pags = self.total_pags
+            
             while contador_pags != (total_pags + 1):
                 args = {'page' : contador_pags, "limit" : LIMITE_PELICULAS}
                 response = requests.get(self.url_lista, params = args)
@@ -58,25 +60,42 @@ class Peliculas:
                         dict = {}
                         dict["id"] = response_json['data']['movies'][i]["id"]
                         dict["title"] = response_json['data']['movies'][i]["title"]
+                        dict["url"] = response_json['data']['movies'][i]["url"]
+                        dict["year"] = response_json['data']['movies'][i]["year"]
+                        dict["rating"] = response_json['data']['movies'][i]["rating"]
+                        dict["genres"] = response_json['data']['movies'][i]["genres"]
+                        dict["synopsis"] = response_json['data']['movies'][i]["synopsis"]
+                        dict["language"] = response_json['data']['movies'][i]["language"]
+                        dict["mpa_rating"] = response_json['data']['movies'][i]["mpa_rating"]
+                        dict["like_count"] = self.obtenerLikes(dict["id"])
                         self.contenido.append(dict)
                         i += 1
                     contador_pags += 1
             
 
-    def obtenerDetalles(self):
-        """Metodo para obtener los detalles de una pelicula"""
+    def obtenerLikes(self, id):
+        """Metodo para obtener los likes de una pelicula
+        Parameters
+        ----------
+        limite: id
+            Id de la pelicula a obtener los likes
+        """
+        args = {'movie_id' : id}
+        response = requests.get(self.url_detalles, params = args)
+        if response.status_code == 200:
+            response_json = json.loads(response.text)
+            return response_json['data']['movie']["like_count"]
 
     def obtenerSugerencias(self):
         """Metodo para obtener sugerencias en base a una pelicula"""
 
     def obtenerComentarios(self):
         """Metodo para obtener comentarios de una pelicula"""
-
+        #Endpoint roto
     def obtenerReviews(self):
         """Metodo para obtener la review de IMDb de una pelicula"""
+        #Endpoint roto
 
-    def obtenerParental(self):
-        """Metodo para obtener la calificacion parental de una pelicula"""
 
     
 
@@ -94,27 +113,8 @@ if __name__ == "__main__":
 
     peliculas = Peliculas()
     peliculas.obtenerContenido()
-    print(peliculas.contenido)
+    #print(peliculas.contenido)
+    with open('data.json', 'w') as f:
+        json.dump(peliculas.contenido, f, ensure_ascii=False, indent=4)
 
-
-
-
-
-
-
-
-
-
-
-"""     total_pages = 39300/20
-    page_number = 1
-     """
-"""     
-    while page_number != total_pages+1:
-        args = {'page': page_number}
-        response = requests.get(url, params = args)
-        if response.status_code == 200:
-            response_json = json.loads(response.text)
-            print(response_json['data']['page_number'])
-            page_number += 1 """
 

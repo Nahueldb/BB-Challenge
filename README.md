@@ -1,10 +1,10 @@
 # BB-Challenge
 Enunciado:
--Obtener todos los contenidos de la plataforma
--Obtener la metadata de cada contenido: título, año, sinopsis, enlace web, géneros
--Obtener los comentarios de cada contenido
+-Obtener todos los contenidos de la plataforma - OK
+-Obtener la metadata de cada contenido: título, año, sinopsis, enlace web, géneros - OK
+-Obtener los comentarios de cada contenido - Endpoint falla
 -Guardar la información obtenida en una base de datos, en archivo .json o .csv automáticamente
-*PLUS: Cantidad de likes
+*PLUS: Cantidad de likes - OK
 *PLUS: Si es posible obtener más información/metadata por cada contenido
 
 Fecha límite para entrega: lunes 21 de febrero hasta las 19:00hs.
