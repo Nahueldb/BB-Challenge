@@ -58,15 +58,15 @@ class Peliculas:
                     i = 0
                     for i in range(len(response_json['data']['movies'])):
                         dict = {}
-                        dict["id"] = response_json['data']['movies'][i]["id"]
-                        dict["title"] = response_json['data']['movies'][i]["title"]
-                        dict["url"] = response_json['data']['movies'][i]["url"]
-                        dict["year"] = response_json['data']['movies'][i]["year"]
-                        dict["rating"] = response_json['data']['movies'][i]["rating"]
-                        dict["genres"] = response_json['data']['movies'][i]["genres"]
-                        dict["synopsis"] = response_json['data']['movies'][i]["synopsis"]
-                        dict["language"] = response_json['data']['movies'][i]["language"]
-                        dict["mpa_rating"] = response_json['data']['movies'][i]["mpa_rating"]
+                        dict["id"] = response_json['data']['movies'][i].get("id")
+                        dict["title"] = response_json['data']['movies'][i].get("title")
+                        dict["url"] = response_json['data']['movies'][i].get("url")
+                        dict["year"] = response_json['data']['movies'][i].get("year")
+                        dict["rating"] = response_json['data']['movies'][i].get("rating")
+                        dict["genres"] = response_json['data']['movies'][i].get("genres")
+                        dict["synopsis"] = response_json['data']['movies'][i].get("synopsis")
+                        dict["language"] = response_json['data']['movies'][i].get("language")
+                        dict["mpa_rating"] = response_json['data']['movies'][i].get("mpa_rating")
                         dict["like_count"] = self.obtenerLikes(dict["id"])
                         self.contenido.append(dict)
                         i += 1
@@ -84,7 +84,8 @@ class Peliculas:
         response = requests.get(self.url_detalles, params = args)
         if response.status_code == 200:
             response_json = json.loads(response.text)
-            return response_json['data']['movie']["like_count"]
+            likes = response_json['data']['movie'].get("like_count")
+            return likes
 
     def obtenerSugerencias(self):
         """Metodo para obtener sugerencias en base a una pelicula"""
@@ -113,8 +114,8 @@ if __name__ == "__main__":
 
     peliculas = Peliculas()
     peliculas.obtenerContenido()
-    #print(peliculas.contenido)
-    with open('data.json', 'w') as f:
-        json.dump(peliculas.contenido, f, ensure_ascii=False, indent=4)
+    print(peliculas.contenido)
+    """ with open('data.json', 'w') as f:
+        json.dump(peliculas.contenido, f, ensure_ascii=False, indent=4) """
 
 
