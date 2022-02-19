@@ -67,32 +67,65 @@ class Peliculas:
                         dict["synopsis"] = response_json['data']['movies'][i].get("synopsis")
                         dict["language"] = response_json['data']['movies'][i].get("language")
                         dict["mpa_rating"] = response_json['data']['movies'][i].get("mpa_rating")
-                        dict["like_count"] = self.obtenerLikes(dict["id"])
-                        self.contenido.append(dict)
+                        detalles = self.obtenerDetalles(dict["id"])
+                        dict["like_count"] = detalles[0]
+                        dict["download_count"] = detalles[1]
+                        #self.contenido.append(dict)
                         i += 1
+                        self.guardar(dict)
+                    print("Pagina ", contador_pags, " de ", total_pags)
                     contador_pags += 1
             
 
-    def obtenerLikes(self, id):
-        """Metodo para obtener los likes de una pelicula
+    def obtenerDetalles(self, id):
+        """Metodo para obtener los likes y descargas de una pelicula
         Parameters
         ----------
-        limite: id
+        id: int
             Id de la pelicula a obtener los likes
+        Returns
+        ----------
+        detalles: list
+            Lista con los likes en el primer lugar y las descargas en el segundo
         """
         args = {'movie_id' : id}
         response = requests.get(self.url_detalles, params = args)
         if response.status_code == 200:
             response_json = json.loads(response.text)
+            detalles = []
             likes = response_json['data']['movie'].get("like_count")
-            return likes
+            descargas = response_json['data']['movie'].get("download_count")
+            detalles.append(likes)
+            detalles.append(descargas)
+            return detalles
 
-    def obtenerSugerencias(self):
-        """Metodo para obtener sugerencias en base a una pelicula"""
+    def obtenerDescargas(self, id):
+        """Metodo para obtener las descargas de una pelicula"""
+        args = {'movie_id' : id}
+        response = requests.get(self.url_detalles, params = args)
+        if response.status_code == 200:
+            response_json = json.loads(response.text)
+            descargas = response_json['data']['movie'].get("download_count")
+            return descargas
 
     def obtenerComentarios(self):
         """Metodo para obtener comentarios de una pelicula"""
         #Endpoint roto
+    def guardar(self, dict):
+        """Metodo para guardar el contenido en un archivo json
+        Parameters
+        ----------
+        dict: dictionary
+            Diccionario con todo el contenido de una pelicula
+        """
+        with open('resultados.json', 'a') as f:
+            json.dump(dict, f, ensure_ascii=False, indent=4)
+            if dict["id"] == 1:
+                f.write("\n")
+            else:
+                f.write(",\n")
+
+        
     def obtenerReviews(self):
         """Metodo para obtener la review de IMDb de una pelicula"""
         #Endpoint roto
@@ -110,11 +143,14 @@ if __name__ == "__main__":
         print(response_json)
     elif response.status_code == 404:
         print("ERROR") """
-
-
+    
+    with open('resultados.json', 'a') as f:
+            f.write("[\n")
     peliculas = Peliculas()
     peliculas.obtenerContenido()
-    print(peliculas.contenido)
+    #print(peliculas.contenido)
+    with open('resultados.json', 'a') as f:
+            f.write("]")
     """ with open('data.json', 'w') as f:
         json.dump(peliculas.contenido, f, ensure_ascii=False, indent=4) """
 
